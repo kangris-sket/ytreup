@@ -6,26 +6,31 @@
       <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
    </head>
    <body>
-      <div class="container text-center">
-         <div class="well">
-         <h1>Youtube ReUploader</h1>
-     <h4>Youtube link</h4>
-     <h4><input type="text" id="ytlink" /></h4>
-     <h4>Title</h4>
-     <h4><input type="text" id="yttitle" /></h4>
-     <h4>Desciption</h4>
-     <h4><textarea name="textarea" id="ytdesc" style="width:350px;height:150px;"></textarea><h4>
-     <h4><input type="checkbox" id="saveoauth" name="oauthreuse" value="1">Save credentials<br></h4>
-     <h6><p>(Multy Upload)</p><h6>
-     <button id="openFile" onclick="downloadvid();">Run</button>
+   <div class="well">
+      <div class="header text-center">        
+         <h2>Youtube ReUploader</h2>
+		 </div>		
+	 <div class="container text-center"> 
+	  <h5>-----------------------------------------------------------------------</h5>
+     <h5>Link Yt      : </h5><input type="text" id="ytlink" value="Link Youtube disini"/>
+     <h5>Judulle      : </h5><input type="text" id="yttitle"  value="Judul.."/>
+     <h5>Desciption   : </h5><textarea name="textarea" id="ytdesc" style="width:350px;height:150px;"></textarea>
+	 <h5>Privacy      : </h5><input type="text" id="ytprivacy" value="Public"/>
+     <h5><input type="checkbox" id="saveoauth" name="oauthreuse" value="1">Save credentials<br></h5>
+     <h6><p>Set multy upload for this sesion</p></h6>	 
+     <h4><button id="openFile" onclick="downloadvid();">Run</button></h4>
+	 
     <!-- All of the Node.js APIs are available in this renderer process. -->
-    <h4><span id="statusup"> Waiting for user input.. </span></h4>
+	<p></p>
+    <h5><span id="statusup"> Waiting for user input.. </span></h5>
     <h4><span id="statusoauth"></span></h4>
     <h4></h4>
     <h4></h4>
     <h4></h4>
+	<h5>----------------------------------------------------------------------</h5>
+	</div>   	
+	  <div class="footer text-center">	 
     <h4>&copy 2017 | by kangris</h4>
-         </div>
       </div>
    </body>
    
@@ -40,6 +45,10 @@ if (document.getElementById('ytlink').value == "") {
 }
 if (document.getElementById('yttitle').value == "") {
     alert("Please enter a title!");
+    return;
+}
+if (document.getElementById('ytprivacy').value == "") {
+    alert("Please enter a privacy (Public,Unlisted or Private!");
     return;
 }
 //      
@@ -79,6 +88,7 @@ function uploadvid () {
     ;
 var titleyt = document.getElementById('yttitle').value;
 var descyt = document.getElementById('ytdesc').value;
+var privyyt = document.getElementById('ytprivacy').value;
 
   if (document.getElementById('saveoauth').checked) {
     document.getElementById("statusoauth").textContent="Credentials saving mode is on";
@@ -96,8 +106,8 @@ let server = new Lien({
 // https://developers.google.com/youtube/v3/guides/moving_to_oauth#service_accounts
 let oauth = Youtube.authenticate({
     type: "oauth"
-  , client_id: "89160986609-eru218qc9hsht0ve331fvm2od27qkbga.apps.googleusercontent.com"
-  , client_secret: "bBLMMQL6dxX_f_mfuP-JPJ7P"
+  , client_id: "1072357486870-a3q5bis5vv5a7tq77v9v62uf87i48b7v.apps.googleusercontent.com"
+  , client_secret: "JwJg2Nhg5ZY87X9UiJBVIhGl"
   , redirect_url: "http://localhost:5000/oauth2callback"
 });
         var normalcred = JSON.parse(fs.readFileSync('credentials.json', 'utf8'));
@@ -113,7 +123,7 @@ let oauth = Youtube.authenticate({
                 }
                 // I don't want to spam my subscribers
               , status: {
-                    privacyStatus: "public"
+                    privacyStatus: privyt
                 }
             }
             // This is for the callback function
@@ -144,8 +154,8 @@ let server = new Lien({
 // https://developers.google.com/youtube/v3/guides/moving_to_oauth#service_accounts
 let oauth = Youtube.authenticate({
     type: "oauth"
-  , client_id: "89160986609-eru218qc9hsht0ve331fvm2od27qkbga.apps.googleusercontent.com"
-  , client_secret: "bBLMMQL6dxX_f_mfuP-JPJ7P"
+  , client_id: "1072357486870-a3q5bis5vv5a7tq77v9v62uf87i48b7v.apps.googleusercontent.com"
+  , client_secret: "JwJg2Nhg5ZY87X9UiJBVIhGl"
   , redirect_url: "http://localhost:5000/oauth2callback"
 });
 
@@ -175,7 +185,7 @@ server.addPage("/oauth2callback", lien => {
                 }
                 // I don't want to spam my subscribers
               , status: {
-                    privacyStatus: "public"
+                    privacyStatus: privyt
                 }
             }
             // This is for the callback function
@@ -210,8 +220,8 @@ server.addPage("/oauth2callback", lien => {
 // https://developers.google.com/youtube/v3/guides/moving_to_oauth#service_accounts
 let oauth = Youtube.authenticate({
     type: "oauth"
-  , client_id: "89160986609-eru218qc9hsht0ve331fvm2od27qkbga.apps.googleusercontent.com"
-  , client_secret: "bBLMMQL6dxX_f_mfuP-JPJ7P"
+  , client_id: "1072357486870-a3q5bis5vv5a7tq77v9v62uf87i48b7v.apps.googleusercontent.com"
+  , client_secret: "JwJg2Nhg5ZY87X9UiJBVIhGl"
   , redirect_url: "http://localhost:5000/oauth2callback"
 });
 
@@ -240,7 +250,7 @@ server.addPage("/oauth2callback", lien => {
                 }
                 // I don't want to spam my subscribers
               , status: {
-                    privacyStatus: "public"
+                    privacyStatus: privyt
                 }
             }
             // This is for the callback function
