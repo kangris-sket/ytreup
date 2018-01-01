@@ -1,0 +1,35 @@
+{
+  "name": "YoutubeReuploader",
+  "version": "1.0.0",
+  "description": "A youtube Tool  Reuploader",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/electron/electron-quick-start.git"
+  },
+  "keywords": [
+    "Electron",
+    "Youtube",
+    "Reupload",
+    "Video"
+  ],
+  "author": "kangris",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/electron/electron-quick-start/issues"
+  },
+  "homepage": "https://github.com/electron/electron-quick-start#readme",
+  "devDependencies": {
+    "electron": "~1.6.2"
+  },
+  "build": {
+  "app-bundle-id": "ytreupload.kangris",
+  "app-category-type": "ytreupload",
+  "win": {
+    "iconUrl": "http://www.iconsdb.com/icons/download/persian-red/youtube-5-multi-size.ico"
+  }
+  }
+}

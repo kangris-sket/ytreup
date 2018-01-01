@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+   <head>
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.js"></script>
+       <title>Youtube Tool ReUploader</title>
+      <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+   </head>
+   <body>
+      <div class="container text-center">
+         <div class="well">
+         <h1>Youtube ReUploader</h1>
+     <h4>Youtube link</h4>
+     <h4><input type="text" id="ytlink" /></h4>
+     <h4>Title</h4>
+     <h4><input type="text" id="yttitle" /></h4>
+     <h4>Desciption</h4>
+     <h4><textarea name="textarea" id="ytdesc" style="width:350px;height:150px;"></textarea><h4>
+     <h4><input type="checkbox" id="saveoauth" name="oauthreuse" value="1">Save credentials<br></h4>
+     <h6><p>(Multy Upload)</p><h6>
+     <button id="openFile" onclick="downloadvid();">Run</button>
+    <!-- All of the Node.js APIs are available in this renderer process. -->
+    <h4><span id="statusup"> Waiting for user input.. </span></h4>
+    <h4><span id="statusoauth"></span></h4>
+    <h4></h4>
+    <h4></h4>
+    <h4></h4>
+    <h4>&copy 2017 | by kangris</h4>
+         </div>
+      </div>
+   </body>
+   
+  <script>
+    "use strict";
+    // You can also require other files to run in this process
+    require('./renderer.js')
+    function downloadvid () {
+if (document.getElementById('ytlink').value == "") {
+    alert("Please enter a youtube link!");
+    return;
+}
+if (document.getElementById('yttitle').value == "") {
+    alert("Please enter a title!");
+    return;
+}
+//      
+//      
+//
+document.getElementById("statusup").textContent="Downloading the video....";      
+var fs = require('fs');
+var ytdl = require('ytdl-core');
+var url = document.getElementById('ytlink').value;
+var writeStream = fs.createWriteStream('./cache.mp4');
+
+var dl = ytdl(url);
+
+dl.on("end", function() {
+fs.appendFileSync('cache.mp4', new Array(~~(Math.random() * 10)).fill(0x0).join(''));
+document.getElementById("statusup").textContent="Uploading the video with your settings!"; 
+uploadvid();
+});
+
+
+dl.pipe(writeStream);
+
+
+//
+//
+//
+}
+
+function uploadvid () {
+   const Youtube = require("youtube-api")
+    , fs = require("fs")
+    , readJson = require("r-json")
+    , Lien = require("lien")
+    , Logger = require("bug-killer")
+    , opn = require("opn")
+    , prettyBytes = require("pretty-bytes")
+    ;
+var titleyt = document.getElementById('yttitle').value;
+var descyt = document.getElementById('ytdesc').value;
+
+  if (document.getElementById('saveoauth').checked) {
+    document.getElementById("statusoauth").textContent="Credentials saving mode is on";
+fs.stat('credentials.json', function(err, stat) {
+    if(err == null) {
+        /////////////////EXISTS//////////////////////////////////////////
+        // Init lien server
+let server = new Lien({
+    host: "localhost"
+  , port: 5000
+});
+
+// Authenticate
+// You can access the Youtube resources via OAuth2 only.
+// https://developers.google.com/youtube/v3/guides/moving_to_oauth#service_accounts
+let oauth = Youtube.authenticate({
+    type: "oauth"
+  , client_id: "89160986609-eru218qc9hsht0ve331fvm2od27qkbga.apps.googleusercontent.com"
+  , client_secret: "bBLMMQL6dxX_f_mfuP-JPJ7P"
+  , redirect_url: "http://localhost:5000/oauth2callback"
+});
+        var normalcred = JSON.parse(fs.readFileSync('credentials.json', 'utf8'));
+        oauth.setCredentials(normalcred);
+        document.getElementById("statusup").textContent="Uploading with saved oauth key..."; 
+
+        var req = Youtube.videos.insert({
+            resource: {
+                // Video title and description
+                snippet: {
+                    title: titleyt
+                  , description: descyt
+                }
+                // I don't want to spam my subscribers
+              , status: {
+                    privacyStatus: "public"
+                }
+            }
+            // This is for the callback function
+          , part: "snippet,status"
+
+            // Create the readable stream to upload the video
+          , media: {
+                body: fs.createReadStream("cache.mp4")
+            }
+        }, (err, data) => {
+            document.getElementById("statusup").textContent="Upload complete, have a nice day!"; 
+        });
+
+        setInterval(function () {
+            Logger.log(`${prettyBytes(req.req.connection._bytesDispatched)} bytes uploaded.`);
+        }, 250);
+         /////////////////EXISTS END//////////////////////////////////////////
+    } else if(err.code == 'ENOENT') {
+        /////////////////NORMAL//////////////////////////////////////////
+        // Init lien server
+let server = new Lien({
+    host: "localhost"
+  , port: 5000
+});
+
+// Authenticate
+// You can access the Youtube resources via OAuth2 only.
+// https://developers.google.com/youtube/v3/guides/moving_to_oauth#service_accounts
+let oauth = Youtube.authenticate({
+    type: "oauth"
+  , client_id: "89160986609-eru218qc9hsht0ve331fvm2od27qkbga.apps.googleusercontent.com"
+  , client_secret: "bBLMMQL6dxX_f_mfuP-JPJ7P"
+  , redirect_url: "http://localhost:5000/oauth2callback"
+});
+
+ window.open("https://accounts.google.com/AccountChooser?continue=https://accounts.google.com/o/oauth2/auth?access_type%3Doffline%26scope%3Dhttps://www.googleapis.com/auth/youtube.upload%26response_type%3Dcode%26redirect_uri%3Dhttp://localhost:5000/oauth2callback%26client_id%3D89160986609-eru218qc9hsht0ve331fvm2od27qkbga.apps.googleusercontent.com%26from_login%3D1%26as%3D35a90aa909716ca4&ltmpl=nosignup&btmpl=authsub&scc=1&oauth=1");
+// Handle oauth2 callback
+server.addPage("/oauth2callback", lien => {
+    Logger.log("Trying to get the token using the following code: " + lien.query.code);
+    oauth.getToken(lien.query.code, (err, tokens) => {
+
+        if (err) {
+            lien.lien(err, 400);
+            return Logger.log(err);
+        }
+
+        Logger.log("Got the tokens.");
+        
+        oauth.setCredentials(tokens);
+        fs.writeFile('credentials.json', JSON.stringify(tokens));
+        lien.end("The video is being uploaded. You can close this popup-window!");
+
+        var req = Youtube.videos.insert({
+            resource: {
+                // Video title and description
+                snippet: {
+                    title: titleyt
+                  , description: descyt
+                }
+                // I don't want to spam my subscribers
+              , status: {
+                    privacyStatus: "public"
+                }
+            }
+            // This is for the callback function
+          , part: "snippet,status"
+
+            // Create the readable stream to upload the video
+          , media: {
+                body: fs.createReadStream("cache.mp4")
+            }
+        }, (err, data) => {
+            document.getElementById("statusup").textContent="Upload complete, have a nice day!"; 
+        });
+
+        setInterval(function () {
+            Logger.log(`${prettyBytes(req.req.connection._bytesDispatched)} bytes uploaded.`);
+        }, 250);
+    });
+});
+        /////////////////NORMAL END//////////////////////////////////////////
+    }
+
+});
+        } else {
+          document.getElementById("statusoauth").textContent="Credentials saving mode is off";
+            let server = new Lien({
+    host: "localhost"
+  , port: 5000
+});
+
+// Authenticate
+// You can access the Youtube resources via OAuth2 only.
+// https://developers.google.com/youtube/v3/guides/moving_to_oauth#service_accounts
+let oauth = Youtube.authenticate({
+    type: "oauth"
+  , client_id: "89160986609-eru218qc9hsht0ve331fvm2od27qkbga.apps.googleusercontent.com"
+  , client_secret: "bBLMMQL6dxX_f_mfuP-JPJ7P"
+  , redirect_url: "http://localhost:5000/oauth2callback"
+});
+
+ window.open("https://accounts.google.com/AccountChooser?continue=https://accounts.google.com/o/oauth2/auth?access_type%3Doffline%26scope%3Dhttps://www.googleapis.com/auth/youtube.upload%26response_type%3Dcode%26redirect_uri%3Dhttp://localhost:5000/oauth2callback%26client_id%3D89160986609-eru218qc9hsht0ve331fvm2od27qkbga.apps.googleusercontent.com%26from_login%3D1%26as%3D35a90aa909716ca4&ltmpl=nosignup&btmpl=authsub&scc=1&oauth=1");
+// Handle oauth2 callback
+server.addPage("/oauth2callback", lien => {
+    Logger.log("Trying to get the token using the following code: " + lien.query.code);
+    oauth.getToken(lien.query.code, (err, tokens) => {
+
+        if (err) {
+            lien.lien(err, 400);
+            return Logger.log(err);
+        }
+
+        Logger.log("Got the tokens.");
+        
+        oauth.setCredentials(tokens);
+        lien.end("The video is being uploaded. You can close this popup-window!");
+
+        var req = Youtube.videos.insert({
+            resource: {
+                // Video title and description
+                snippet: {
+                    title: titleyt
+                  , description: descyt
+                }
+                // I don't want to spam my subscribers
+              , status: {
+                    privacyStatus: "public"
+                }
+            }
+            // This is for the callback function
+          , part: "snippet,status"
+
+            // Create the readable stream to upload the video
+          , media: {
+                body: fs.createReadStream("cache.mp4")
+            }
+        }, (err, data) => {
+            document.getElementById("statusup").textContent="Upload complete, have a nice day!"; 
+        });
+
+        setInterval(function () {
+            Logger.log(`${prettyBytes(req.req.connection._bytesDispatched)} bytes uploaded.`);
+        }, 250);
+    });
+});
+        }
+  
+
+        /////////////////NORMAL END//////////////////////////////////////////
+    }
+
+  </script>
+</html>
