@@ -1,6 +1,6 @@
 {
   "name": "YoutubeReuploader",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A youtube Tool  Reuploader",
   "main": "main.js",
   "scripts": {
@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/electron/electron-quick-start#readme",
   "devDependencies": {
-    "electron": "~1.6.2"
+    "electron": "~1.8.2"
   },
   "build": {
   "app-bundle-id": "ytreupload.kangris",
